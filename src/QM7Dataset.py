@@ -42,11 +42,26 @@ class QM7Data:
 def _align_coords(point_cloud: np.ndarray) -> np.ndarray:
     """
     Expects input of size (3, n_points). 
-    If X is the input and X = USV^t is the SVD, this function returns U^tX
+    If X is the input and X = USV^t is the SVD, this function returns U^tX. 
+    The rows of U are the singular vectors. We want U[0,0] > 0 and U[1, 0] > 0 to 
+    alleviate any sign ambiguity. 
     """
     u, _, _ = np.linalg.svd(point_cloud, full_matrices=False, compute_uv=True)
 
-    return np.matmul(u.T, point_cloud)
+    if u[0, 0] >= 0 and u[1, 0] >= 0:
+        sign_mat = np.eye(3)
+    elif u[0, 0] >= 0 and u[1, 0] < 0:
+        sign_mat = np.diag([1., -1., -1.])
+    elif u[0, 0] < 0 and u[1, 0] >= 0:
+        sign_mat = np.diag([-1., 1., -1.])
+    elif u[0, 0] < 0 and u[1, 0] < 0:
+        sign_mat = np.diag([-1., -1., 1.])
+    else:
+        raise ValueError(f"Can't figure out sign pattern for {u}")
+
+
+    signed_u = np.matmul(sign_mat, u)
+    return np.matmul(signed_u.T, point_cloud)
 
 def load_QM7(fp: str, 
                 n_train: int=2, 

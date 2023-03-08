@@ -1,7 +1,6 @@
 import numpy as np
 import numba
 
-QM7_CHARGE_LST = [1., 6., 7., 8., 16.]
 QM7_NUM_CHARGES = 5
 
 @numba.jit(nopython=True)
@@ -14,7 +13,7 @@ def random_feature(x: np.ndarray,
 
     return np.sin(np.dot(x - y, random_vector))
 
-# @numba.jit(nopython=True)
+@numba.jit(nopython=True)
 def feature_map(coords: np.ndarray, 
                 charges: np.ndarray,
                 random_vector: np.ndarray) -> np.ndarray:
@@ -34,6 +33,10 @@ def feature_map(coords: np.ndarray,
     Returns:
         np.ndarray: _description_
     """
+    # Needs to be inside function def to make numba compile
+    QM7_CHARGE_LST = [1., 6., 7., 8., 16.]
+
+
     out = np.zeros((QM7_NUM_CHARGES ** 2), dtype=np.float32)
 
     for idx_1, c_1 in enumerate(QM7_CHARGE_LST):
