@@ -22,7 +22,7 @@ def feature_map(coords: np.ndarray,
     map defined by section 5 in the project writeup. Given charges c_1, c_2 the feature
     map is:
     
-    \sum_{x has charge c_1} \sum_{y has charge c_2} sin(<x - y, random_vector>)
+    sum_{x has charge c_1} sum_{y has charge c_2} sin(<x - y, random_vector>)
 
     We return a vector evaluating this feature map over all ordered pairs (c_1, c_2)
 
