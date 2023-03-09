@@ -16,11 +16,11 @@ definitions:
     !SLURMQueue
       jobs_folder: jobs/2023-03-09
       job_name_key: job_name
-      fake_submission: true
+      # fake_submission: true
 
   constants:
     fp_data: &FP_DATA "data/qm7/qm7.mat"
-    dir_results: &DIR_RESULTS "data/results/2023-03-09_hyperparam_opt_0.txt"
+    fp_results: &FP_RESULTS "data/results/2023-03-09_hyperparam_opt_0.txt"
     dir_save_data: &DIR_SAVE_DATA "data/generated"
 
 

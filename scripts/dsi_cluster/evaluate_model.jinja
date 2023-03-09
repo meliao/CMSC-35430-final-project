@@ -3,7 +3,7 @@
 #SBATCH --job-name={{ job_name }}
 #SBATCH --time={{ job_walltime }}
 #SBATCH --partition={{ partition }}
-#SBATCH --cpus-per-task{{ cpus }}
+#SBATCH --cpus-per-task={{ cpus }}
 #SBATCH --mem={{ mem }}
 #SBATCH --output={{ logs_folder }}/{{ job_name }}.out
 #SBATCH --error={{ logs_folder }}/{{ job_name }}.err
@@ -30,7 +30,7 @@ which python
 {{ save_results_fp }} \
 {{ l2_reg }} \
 {{ n_features }} \
-{{ random_vecor_stddev }} \
+{{ random_vector_stddev }} \
 {{ save_data_fp }}
 
 
