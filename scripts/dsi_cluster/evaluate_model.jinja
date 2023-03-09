@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#SBATCH --job-name={{ job_name }}
+#SBATCH --time={{ job_walltime }}
+#SBATCH --partition={{ partition }}
+#SBATCH --cpus-per-task{{ cpus }}
+#SBATCH --mem={{ mem }}
+#SBATCH --output={{ logs_folder }}/{{ job_name }}.out
+#SBATCH --error={{ logs_folder }}/{{ job_name }}.err
+### S B A T C H --exclude={{ exclude_gpu }}
+
+export NUMBA_NUM_THREADS={{ cpus }}
+export OMP_NUM_THREADS={{ cpus }}
+
+echo "`date` Starting Job"
+echo "SLURM Info: Job name:${SLURM_JOB_NAME}"
+echo "    JOB ID: ${SLURM_JOB_ID}"
+echo "    Host list: ${SLURM_JOB_NODELIST}"
+echo "    OMP_NUM_THREADS: ${OMP_NUM_THREADS}"
+echo "    NUMBA_NUM_THREADS: ${NUMBA_NUM_THREADS}"
+
+
+which python
+
+{{ command }} \
+{{ fp_data }} \
+{{ n_train }} \
+{{ n_test }} \
+{{ val_fraction }} \
+{{ save_results_fp }} \
+{{ l2_reg }} \
+{{ n_features }} \
+{{ random_vecor_stddev }} \
+{{ save_data_fp }}
+
+
+
