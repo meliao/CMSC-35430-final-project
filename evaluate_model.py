@@ -24,6 +24,7 @@ def setup_args() -> argparse.Namespace:
     parser.add_argument('-l2_reg', type=float, nargs='+', default=[0.])
     parser.add_argument('-save_results_fp')
     parser.add_argument('-save_data_fp')
+    parser.add_argument('-with_directional_info', type=bool, default=True)
 
     return parser.parse_args()
 
@@ -76,23 +77,27 @@ def main(args: argparse.Namespace) -> None:
     random_weights = np.random.normal(size=random_weights_shape, scale=args.random_vector_stddev).astype(np.float32)
 
     # Compute random feature matrices
+    logging.info("With directional info is: %s", args.with_directional_info)
     logging.info("Computing random features on the train set")
     train_random_features = feature_map_on_dset(train_dset.aligned_coords,
                                                 train_dset.charges,
                                                 train_dset.n_atoms,
-                                                random_weights)
+                                                random_weights,
+                                                args.with_directional_info)
 
     logging.info("Computing random features on the val set")
     val_random_features = feature_map_on_dset(val_dset.aligned_coords,
                                                 val_dset.charges,
                                                 val_dset.n_atoms,
-                                                random_weights)
+                                                random_weights,
+                                                args.with_directional_info)
 
     logging.info("Computing random features on the test set")
     test_random_features = feature_map_on_dset(test_dset.aligned_coords,
                                                 test_dset.charges,
                                                 test_dset.n_atoms,
-                                                random_weights)
+                                                random_weights,
+                                                args.with_directional_info)
 
 
     # Train linear weights
@@ -124,6 +129,7 @@ def main(args: argparse.Namespace) -> None:
                 'n_features': args.n_features,
                 'random_weights_scale': args.random_vector_stddev,
                 'l2_reg': l2_reg,
+                'with_directional_info': args.with_directional_info,
 
                 # Supplementary data
                 'min_singular_val': s[-1],

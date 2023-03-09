@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.feature_map import feature_map, feature_map_on_dset, random_feature
+from src.feature_map import feature_map, feature_map_on_dset, random_feature_with_directional_info, random_feature_without_directional_info
 from test_utils import check_arrays_close, check_scalars_close
 
 class Test_feature_map:
@@ -19,7 +19,7 @@ class Test_feature_map:
 
         expected_out = np.sin(coords_diff_0) + np.sin(coords_diff_1)
 
-        out = feature_map(coords, charges, random_vec)
+        out = feature_map(coords, charges, random_vec, True)
 
         check_scalars_close(out[0], expected_out)
 
@@ -28,18 +28,27 @@ class Test_feature_map:
 
 
 
-class Test_random_feature:
+class Test_random_feature_with_directional_info:
     def test_0(self) -> None:
         x = np.zeros(3, dtype=np.float32)
         y = np.zeros(3, dtype=np.float32)
         x[0] = 1.
         random_vector = np.zeros(3, dtype=np.float32)
 
-        out = random_feature(x, y, random_vector)
+        out = random_feature_with_directional_info(x, y, random_vector)
 
         check_scalars_close(out, 0.)
 
+class Test_random_feature_without_directional_info:
+    def test_0(self) -> None:
+        x = np.zeros(3, dtype=np.float32)
+        y = np.zeros(3, dtype=np.float32)
+        x[0] = 1.
+        random_vector = np.zeros(3, dtype=np.float32)
 
+        out = random_feature_without_directional_info(x, y, random_vector)
+
+        check_scalars_close(out, 0.)
 
 class Test_feature_map_on_dset:
     def test_0(self) -> None:
@@ -54,7 +63,25 @@ class Test_feature_map_on_dset:
 
         random_weights = np.random.normal(size=(4,3))
 
-        out = feature_map_on_dset(coords, charges, n_atoms, random_weights)
+        out = feature_map_on_dset(coords, charges, n_atoms, random_weights, True)
+
+        assert out.shape == (2, 100)
+
+        assert np.logical_not(np.any(np.isnan(out)))
+
+    def test_1(self) -> None:
+        """
+        Just want to make sure everything runs without error
+        """
+
+        coords = np.random.normal(size=(2, 5, 3), scale=1.)
+        charges = np.array([[1., 6., 6., 0., 0.],
+                            [1., 1., 1., 1., 6.]])
+        n_atoms = np.array([3, 5])
+
+        random_weights = np.random.normal(size=(4,3))
+
+        out = feature_map_on_dset(coords, charges, n_atoms, random_weights, False)
 
         assert out.shape == (2, 100)
 

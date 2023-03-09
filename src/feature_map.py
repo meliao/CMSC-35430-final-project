@@ -4,19 +4,33 @@ import numba
 QM7_NUM_CHARGES = 5
 
 @numba.jit(nopython=True)
-def random_feature(x: np.ndarray,
-                    y: np.ndarray,
-                    random_vector: np.ndarray) -> np.float32:
+def random_feature_with_directional_info(x: np.ndarray,
+                                            y: np.ndarray,
+                                            random_vector: np.ndarray) -> np.float32:
     """
     Returns sin(<x - y, random_vector>)
     """
+    xy_norm = np.linalg.norm(x - y)
+    xy_normalized = (x - y) / xy_norm
 
-    return np.sin(np.dot(x - y, random_vector))
+    return np.sin(np.dot(xy_normalized, random_vector) * (xy_norm ** -2))
+
+@numba.jit(nopython=True)
+def random_feature_without_directional_info(x: np.ndarray,
+                                            y: np.ndarray,
+                                            random_vector: np.ndarray) -> np.float32:
+    """
+    Returns sin(<x - y, random_vector>)
+    """
+    xy_norm = np.linalg.norm(x - y)
+
+    return np.sin(random_vector[0] * (xy_norm ** -2))
 
 @numba.jit(nopython=True)
 def feature_map(coords: np.ndarray, 
                 charges: np.ndarray,
-                random_vector: np.ndarray) -> np.ndarray:
+                random_vector: np.ndarray,
+                with_directional_info: bool) -> np.ndarray:
     """Given a sample defined by aligned coordinates and charges, compute a feature
     map defined by section 5 in the project writeup. Given charges c_1, c_2 the feature
     map is:
@@ -29,6 +43,7 @@ def feature_map(coords: np.ndarray,
         coords (np.ndarray): Has shape (n_atoms, 3)
         charges (np.ndarray): Has shape (n_atoms)
         random_vector (np.ndarray): Has shape (3)
+        with_directional_info (bool): Whether to use directional information when computing the random feature
 
     Returns:
         np.ndarray: _description_
@@ -51,9 +66,15 @@ def feature_map(coords: np.ndarray,
             for i in range(c_1_coords.shape[0]):
                 x_i = c_1_coords[i]
                 for j in range(c_2_coords.shape[0]):
+                    if c_1 == c_2 and i == j:
+                        continue
                     y_j = c_2_coords[j]
 
-                    out[out_idx] += random_feature(x_i, y_j, random_vector)
+                    if with_directional_info:
+                        out[out_idx] += random_feature_with_directional_info(x_i, y_j, random_vector)
+                    else:
+                        out[out_idx] += random_feature_without_directional_info(x_i, y_j, random_vector)
+                        
 
     return out
 
@@ -62,7 +83,8 @@ def feature_map(coords: np.ndarray,
 def feature_map_on_dset(coords: np.ndarray,
                         charges: np.ndarray,
                         n_atoms: np.ndarray,
-                        random_weights: np.ndarray) -> np.ndarray:
+                        random_weights: np.ndarray,
+                        with_directional_info: bool) -> np.ndarray:
     """_summary_
 
     Args:
@@ -87,7 +109,7 @@ def feature_map_on_dset(coords: np.ndarray,
         for j in range(n_features):
             idx_start = j * QM7_NUM_CHARGES * QM7_NUM_CHARGES
             idx_end = (j + 1) * QM7_NUM_CHARGES * QM7_NUM_CHARGES
-            out[i, idx_start:idx_end] = feature_map(coords_i, charges_i, random_weights[j])
+            out[i, idx_start:idx_end] = feature_map(coords_i, charges_i, random_weights[j], with_directional_info)
 
     return out
 
