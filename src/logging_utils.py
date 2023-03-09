@@ -27,7 +27,7 @@ def write_result_to_file(fp: str, missing_str: str='', **trial) -> None:
     with open(fp, 'a') as f:
         f.write(trial_line)
 
-FMT = "%(asctime)s:Lorentz_group_RF: %(levelname)s - %(message)s"
+FMT = "%(asctime)s:CMSC-35430: %(levelname)s - %(message)s"
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 
 

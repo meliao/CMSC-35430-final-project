@@ -58,3 +58,37 @@ def feature_map(coords: np.ndarray,
     return out
 
 
+@numba.jit(nopython=True, parallel=True)
+def feature_map_on_dset(coords: np.ndarray,
+                        charges: np.ndarray,
+                        n_atoms: np.ndarray,
+                        random_weights: np.ndarray) -> np.ndarray:
+    """_summary_
+
+    Args:
+        coords (np.ndarray): shape (n_samples, max_n_atoms, 3)
+        charges (np.ndarray): shape (n_samples, max_n_atoms)
+        n_atoms (np.ndarray): shape (n_samples,)
+        random_weights (np.ndarray): shape (n_features, 3)
+
+    Returns:
+        np.ndarray: shape (n_samples, n_features * QM7_NUM_CHARGES * QM7_NUM_CHARGES) = (n_samples, n_features * 25)
+    """
+    
+    n_features = random_weights.shape[0]
+    n_samples = coords.shape[0]
+
+    out = np.full((n_samples, n_features * QM7_NUM_CHARGES * QM7_NUM_CHARGES), np.nan, np.float32)
+    for i in numba.prange(n_samples):
+        n_atoms_i = n_atoms[i]
+        charges_i = charges[i, :n_atoms_i]
+        coords_i = coords[i, :n_atoms_i]
+
+        for j in range(n_features):
+            idx_start = j * QM7_NUM_CHARGES * QM7_NUM_CHARGES
+            idx_end = (j + 1) * QM7_NUM_CHARGES * QM7_NUM_CHARGES
+            out[i, idx_start:idx_end] = feature_map(coords_i, charges_i, random_weights[j])
+
+    return out
+
+

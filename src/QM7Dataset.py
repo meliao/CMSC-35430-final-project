@@ -4,7 +4,7 @@ from typing import Tuple, Type, List
 from scipy import io
 import numpy as np
 
-
+KCAL_MOL_TO_EV = 0.0433634
 class QM7Data:
     def __init__(self, 
                     coords: np.ndarray,
@@ -24,6 +24,9 @@ class QM7Data:
         self.n_samples, self.max_n_atoms = self.charges.shape
 
         self.aligned_coords = None
+
+    def __len__(self) -> int:
+        return self.n_samples
 
     def align_coords(self: None) -> None:
         """Uses PCA to align molecules into a canonical alignment.
@@ -83,7 +86,7 @@ def load_QM7(fp: str,
     data = io.loadmat(fp)
 
     # Atomization energies (labels)
-    T = data['T'].flatten()
+    T = data['T'].flatten() * KCAL_MOL_TO_EV # now units are in eV
     # Splits for CV
     P = data['P']
     # Cartesian coordinates of atoms (size 7165 x 23 x 3)

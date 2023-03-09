@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.feature_map import feature_map, random_feature
+from src.feature_map import feature_map, feature_map_on_dset, random_feature
 from test_utils import check_arrays_close, check_scalars_close
 
 class Test_feature_map:
@@ -38,3 +38,24 @@ class Test_random_feature:
         out = random_feature(x, y, random_vector)
 
         check_scalars_close(out, 0.)
+
+
+
+class Test_feature_map_on_dset:
+    def test_0(self) -> None:
+        """
+        Just want to make sure everything runs without error
+        """
+
+        coords = np.random.normal(size=(2, 5, 3), scale=1.)
+        charges = np.array([[1., 6., 6., 0., 0.],
+                            [1., 1., 1., 1., 6.]])
+        n_atoms = np.array([3, 5])
+
+        random_weights = np.random.normal(size=(4,3))
+
+        out = feature_map_on_dset(coords, charges, n_atoms, random_weights)
+
+        assert out.shape == (2, 100)
+
+        assert np.logical_not(np.any(np.isnan(out)))
