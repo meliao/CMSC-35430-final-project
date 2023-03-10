@@ -8,7 +8,7 @@ def random_feature_with_directional_info(x: np.ndarray,
                                             y: np.ndarray,
                                             random_vector: np.ndarray) -> np.float32:
     """
-    Returns sin(<x - y, random_vector>)
+    Returns sin(<x - y, random_vector> || x - y||^{-2})
     """
     xy_norm = np.linalg.norm(x - y)
     xy_normalized = (x - y) / xy_norm
@@ -20,7 +20,7 @@ def random_feature_without_directional_info(x: np.ndarray,
                                             y: np.ndarray,
                                             random_vector: np.ndarray) -> np.float32:
     """
-    Returns sin(<x - y, random_vector>)
+    Returns sin( ||x - y||^{-2} * random_vector)
     """
     xy_norm = np.linalg.norm(x - y)
 
@@ -35,7 +35,7 @@ def feature_map(coords: np.ndarray,
     map defined by section 5 in the project writeup. Given charges c_1, c_2 the feature
     map is:
     
-    sum_{x has charge c_1} sum_{y has charge c_2} sin(<x - y, random_vector>)
+    sum_{x has charge c_1} sum_{y has charge c_2} random_feature(x, y, random_vector)
 
     We return a vector evaluating this feature map over all ordered pairs (c_1, c_2)
 
@@ -85,7 +85,7 @@ def feature_map_on_dset(coords: np.ndarray,
                         n_atoms: np.ndarray,
                         random_weights: np.ndarray,
                         with_directional_info: bool) -> np.ndarray:
-    """_summary_
+    """Computes a feature matrix where entry i,j is the jth random feature evaluated on sample i.
 
     Args:
         coords (np.ndarray): shape (n_samples, max_n_atoms, 3)
