@@ -9,7 +9,8 @@ class QM7Data:
     def __init__(self, 
                     coords: np.ndarray,
                     charges: np.ndarray,
-                    atomization_energies: np.ndarray) -> None:
+                    atomization_energies: np.ndarray,
+                    idxes: np.ndarray=None) -> None:
         """
         coords has shape (n_samples, max_n_atoms, 3)
         charges has shape (n_samples, max_n_atoms)
@@ -23,6 +24,7 @@ class QM7Data:
 
         self.n_samples, self.max_n_atoms = self.charges.shape
 
+        self.idxes = idxes
         self.aligned_coords = None
 
     def __len__(self) -> int:
@@ -115,13 +117,16 @@ def load_QM7(fp: str,
 
     train_dset = QM7Data(coords=R[train_idxes],
                             charges=Z[train_idxes],
-                            atomization_energies=T[train_idxes])
+                            atomization_energies=T[train_idxes],
+                            idxes=train_idxes)
     val_dset = QM7Data(coords=R[val_idxes],
                             charges=Z[val_idxes],
-                            atomization_energies=T[val_idxes])
+                            atomization_energies=T[val_idxes],
+                            idxes=val_idxes)
 
     test_dset = QM7Data(coords=R[test_idxes],
                             charges=Z[test_idxes],
-                            atomization_energies=T[test_idxes])
+                            atomization_energies=T[test_idxes],
+                            idxes=test_idxes)
 
     return (train_dset, val_dset, test_dset)

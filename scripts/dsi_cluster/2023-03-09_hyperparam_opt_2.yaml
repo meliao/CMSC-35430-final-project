@@ -6,21 +6,21 @@ definitions:
   copy_to_item: true
 
   default_arguments:
-    job_walltime: "1:30:00"
-    logs_folder: logs/2023-03-09
+    job_walltime: "1:00:00"
+    logs_folder: logs/2023-03-10
     partition: "general"
     cpus: 4
     mem: "40G"
 
   submission:
     !SLURMQueue
-      jobs_folder: jobs/2023-03-09
+      jobs_folder: jobs/2023-03-10
       job_name_key: job_name
       # fake_submission: true
 
   constants:
     fp_data: &FP_DATA "data/qm7/qm7.mat"
-    fp_results: &FP_RESULTS "data/results/2023-03-09_hyperparam_opt_2.txt"
+    fp_results: &FP_RESULTS "data/results/2023-03-10_hyperparam_opt_3.txt"
     dir_save_data: &DIR_SAVE_DATA "data/generated"
 
 
@@ -35,7 +35,7 @@ arguments:
 
   - !Range
     name: with_direction
-    values: [ True, False ]
+    values: [ "T", "F" ]
     prefix: "-with_directional_info"
     metadata_rules: [ !SaveValueInMetadata { path: with_direction } ]
 
@@ -47,13 +47,13 @@ arguments:
 
   - !Range
     name: random_vector_stddev
-    values: [ 0.01, 0.1, 1.0, 10. ]
+    values: [ 0.01, 0.1, 1.0, 10., 100., 1000. ]
     prefix: "-random_vector_stddev"
     metadata_rules: [ !SaveValueInMetadata { path: random_vector_stddev }]
   
   - !ArgumentFromMetadata
     name: job_name
-    format_rule: "2023-03-09_run_2_weight_stddev_{random_vector_stddev}_n_features_{n_features}_with_direction_{with_direction}"
+    format_rule: "2023-03-10_run_2_weight_stddev_{random_vector_stddev}_n_features_{n_features}_with_direction_{with_direction}"
     sources: [ {path: random_vector_stddev, destination: random_vector_stddev},
     {path: n_features, destination: n_features},
     {path: with_direction, destination: with_direction} ]

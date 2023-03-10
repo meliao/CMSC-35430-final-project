@@ -13,4 +13,4 @@ python evaluate_model.py \
 -l2_reg 0 0.1 1e-02 1e-03 1e-04 1e-05 1e-06 \
 -save_results_fp $save_results_fp \
 -save_data_fp $save_data_fp \
--with_directional_info False
+-with_directional_info F
